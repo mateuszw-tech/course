@@ -7,3 +7,4 @@
 > 
 - ### Jeżeli temat Cię interesuje możesz obczaić też jakie są różne implementacje Pythona
 > 
+%red% Colored Text %%
