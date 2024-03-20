@@ -58,5 +58,62 @@ print(person["name"])
 
 ---
 
-- ### Kompresje
-> 
+- ## Notatki
+> ### Kompresje
+>> SYNTAX: `output_list = [output_exp for var in input_list if (var satisfies this condition)] `   
+>>W skrócie tworzymy nowe tablice za pomocą pętli, niekoniecznie tego samego typu z którego konwertujemy
+[LINK](https://www.geeksforgeeks.org/comprehensions-in-python/)
+>>
+    ```
+        input_list = [1, 2, 3, 4, 5, 6, 7]
+        output_dict = {}
+        for var in input_list:
+            if var % 2 != 0:
+                output_dict[var] = var**3
+        print("Output Dictionary using for loop:",output_dict )
+    ```
+> ### Enumeracja
+>> Syntax: `enumerate(iterable, start=0)`  
+>> W skórcie robimy foreacha z dowolnym indexem startowym na dowolnym możliwym do wykonania obiekcie i zwracamy tablice przelecianej wartości.
+[LINK](https://www.geeksforgeeks.org/enumerate-in-python/)
+>>
+    ```
+    Lista = ["eat", "sleep", "repeat"]
+    obj1 = enumerate(Lista)
+    print ("Return type:", type(obj1))
+    print (list(enumerate(Lista)))
+    >>>Return type: <class 'enumerate'>  
+    [(0, 'eat'), (1, 'sleep'), (2, 'repeat')]
+    
+    ```    
+> ### magic/dunder methods
+>> SYNTAX: `def __metoda__`  
+>> Te wszystkie metody typu `__init__ `
+[LINK](https://www.geeksforgeeks.org/dunder-magic-methods-python/)
+>>
+```
+# declare our own string class 
+class String: 
+          
+    # magic method to initiate object 
+    def __init__(self, string): 
+        self.string = string  
+              
+    # print our string object 
+    def __repr__(self): 
+        return 'Object: {}'.format(self.string) 
+              
+    def __add__(self, other): 
+        return self.string + other 
+      
+# Driver Code 
+if __name__ == '__main__': 
+          
+    # object creation 
+    string1 = String('Hello') 
+          
+    # concatenate String object and a string 
+    print(string1 +' Geeks') 
+    
+```  
+
