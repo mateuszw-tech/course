@@ -115,5 +115,91 @@ if __name__ == '__main__':
     # concatenate String object and a string 
     print(string1 +' Geeks') 
     
-```  
+```
+> ### metody w klasach
+>> Funkcja Klasy operuje na instancji danej klasy  
+>> @staticmethod pozwala na wywołanie meody statycznej bez tworzenia instancji klasy   
+>> @classmethod tutaj najłatwiej opisać za pomocą przykładu.   
+```
+from datetime import date
+
+# random Person
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    @classmethod
+    def fromBirthYear(cls, name, birthYear):
+        return cls(name, date.today().year - birthYear)
+
+    def display(self):
+        print(self.name + "'s age is: " + str(self.age))
+
+person = Person('Adam', 19)
+person.display()
+
+person1 = Person.fromBirthYear('John',  1985)
+person1.display()
+```
+> ### dataclass
+>> `from dataclasses import dataclass`  
+>> Używane są po to żeby przetrzymywać dane, łatwiej zwrócić ich wartości  
+>> parametry Dataclass `@dataclass(init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False,
+           match_args=True, kw_only=False, slots=False, weakref_slot=False)` Każdy wyjaśniony w docsach [LINK](https://docs.python.org/3/library/dataclasses.html)
+```
+@dataclass
+class GfgArticle():
+    """A class for holding an article content"""
+ 
+    # Attributes Declaration
+    # using Type Hints
+ 
+    title: str
+    author: str
+    language: str
+    upvotes: int
+ 
+# A DataClass object
+article = GfgArticle("DataClasses",
+                     "vibhu4agarwal",
+                     "Python", 0)
+```
+---
+
+- ## Pytania
+> 1. Python to język interpretowany czy kompilowany?
+>>  Interpretowany
+> 2. Czy twój int do którego przypiszesz coraz większe duże liczby będzie miał dużą pojemność już na początku? Czy program rozkminia jak twoja zmienna liczbowa będzie
+duża przed jego wykonaniem na podstawie kodu?  
+>> Python dynamicznie przypisuje wartość w trakcie wykonywania kodu
+> 3. Czy w Pythonie są tablice jak w innych językach? Czy są potrzebne?  
+>> W pythonie tablice dzielimy na listy, dicty, tuple, sety. Nie używamy składni array 
+> 4. Dlaczego niektóre zmienne, fieldy, metody w Pythonie zaczynają się od podłogi ( _ )?  
+>> _protected __private
+> 5. Czy w Pythonie są overloady funkcji/metod? (spoiler - nie ma xD ) Jak można to obejść, jak się "overloaduje" w Pythonie? Co robić, gdy chcesz podobnie działające metody, z
+innymi sygnaturami?  
+>> możemy iterować po ilości argumentów za pomocą referencji *args w parametrze metody
+> 6. Czy w Pythonie można mieć więcej niż jeden konstruktor? (znowu spoiler - nie xd ) Jak można to obejść? Tip: classmethods  
+>> tutaj chyba najprościej za pomocą przykładu: 
+```
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    @classmethod
+    def from_birth_year(cls, name, birth_year):
+        current_year = 2024
+        age = current_year - birth_year
+        return cls(name, age)
+
+person = Person.from_birth_year("John", 1980)
+print(person.name)
+print(person.age)
+```
+> 7. Dlaczego metoda która nie używa self powinna być w większości przypadków statyczna?  
+>> nie potrzebują one operować na instancjach klasy
+> 8. Co to jest JSON? Czy Pythonowy dict jest podobny do JSON?  
+>> JSON to format danych, i json i dict są oparte na kluczach i wartościach.
 
