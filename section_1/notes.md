@@ -21,7 +21,7 @@ def hello()
 > potem
 
 ---
-- ### Kolekcje
+- ### Tablice
 >### List 
 >>Listy są mutowalne czyli że można zmieniać ich zawartość [LINK](https://www.w3schools.com/python/python_lists.asp)
 >>
