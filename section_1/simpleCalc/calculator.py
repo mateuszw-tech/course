@@ -13,7 +13,7 @@ class CalculatorUtils:
         elif operator == "/":
             return first / second
         elif operator == "^":
-            return first ** second
+            return first**second
 
 
 class CalculatorApp:
