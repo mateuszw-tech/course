@@ -24,7 +24,7 @@ class CalculatorApp:
         self.window.configure(bg="#0D1B2A")
         self.frame = tkinter.Frame(self.window, bg="#0D1B2A")
 
-    def calculator_view(self):
+    def display_app(self):
         def result(operator: str):
             result_label.config(
                 text=CalculatorUtils.calculate(operator, int(first_number.get()), int(second_number.get()))
