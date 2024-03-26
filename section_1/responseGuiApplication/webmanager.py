@@ -2,6 +2,7 @@ import json
 import requests
 from datetime import date
 import os
+from tkinter import messagebox
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 import customtkinter as ctk
@@ -43,10 +44,7 @@ class ManagerGUI:
         button_middle = ctk.CTkButton(
             master=self.websites_button_frame,
             text="add",
-            command=lambda: [
-                WebContentUtils.add_website(self.filename),
-                WebContentUtils.configure_path(self.filename, websites_label),
-            ],
+            command=lambda: self.add_button_action(websites_label),
         )
         button_middle.pack(padx=0, side=RIGHT)
 
@@ -94,6 +92,13 @@ class ManagerGUI:
 
         self.root.mainloop()
 
+    def add_button_action(self, label):
+        try:
+            WebContentUtils.add_website(self.filename),
+            WebContentUtils.configure_path(self.filename, label)
+        except FileNotFoundError as e:
+            messagebox.showinfo("Opps!", f"{e}")
+
     def load_filename(self, label):
         self.filename = WebContentUtils.return_filename()
         WebContentUtils.configure_path(self.filename, label)
@@ -118,7 +123,7 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-        data: list = None,  # dodać [type]
+            data: list = None,  # dodać [type]
     ) -> None:
         number = 0
         file_path = "archive/archive.txt"
@@ -165,6 +170,11 @@ class WebContentUtils:
 
     @staticmethod
     def add_website(filepath: str) -> None:
+        with open(filepath, "a") as file:
+            file.write("\n" + "https://csstats.gg")
+
+    @staticmethod
+    def delete_website(filepath: str) -> None:
         with open(filepath, "a") as file:
             file.write("\n" + "https://csstats.gg")
 
