@@ -13,7 +13,7 @@ class ManagerGUI:
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
         self.root = ctk.CTk()
-        self.root.title("responseGUI")
+        self.root.title("responseGUI 1.0")
         self.root.iconbitmap("images/nerd.ico")
         self.root.geometry("1080x720")
         self.websites_frame = ctk.CTkFrame(master=self.root)
