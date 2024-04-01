@@ -39,7 +39,8 @@ class ManagerGUI:
             command=lambda: WebContentUtils.pull_websites_content(self.filename),
         )
         button_right.pack(padx=0, side=RIGHT)
-        button_right = ctk.CTkButton(master=self.websites_button_frame, text="delete")
+        button_right = ctk.CTkButton(master=self.websites_button_frame, text="delete",
+                                     command=lambda: self.delete_button_action(websites_label))
         button_right.pack(padx=10, side=RIGHT)
         button_middle = ctk.CTkButton(
             master=self.websites_button_frame,
@@ -95,6 +96,13 @@ class ManagerGUI:
     def add_button_action(self, label):
         try:
             WebContentUtils.add_website(self.filename),
+            WebContentUtils.configure_path(self.filename, label)
+        except FileNotFoundError as e:
+            messagebox.showinfo("Opps!", f"{e}")
+
+    def delete_button_action(self, label):
+        try:
+            WebContentUtils.delete_website(self.filename),
             WebContentUtils.configure_path(self.filename, label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
@@ -156,27 +164,54 @@ class WebContentUtils:
 
     @staticmethod
     def pull_websites_content(filename: str) -> None:
-        data: list = []
-        for website in open(filename, "r").read().split("\n"):
-            response = requests.get(website)
-            data.append(
-                {
-                    "Date": str(date.today()),
-                    "Address": website,
-                    "Content": str(response),
-                }
-            )
-        WebContentUtils._save_websites_data_to_file(data)
+        try:
+            data: list = []
+            for website in open(filename, "r").read().split("\n"):
+                response = requests.get(website)
+                data.append(
+                    {
+                        "Date": str(date.today()),
+                        "Address": website,
+                        "Content": str(response),
+                    }
+                )
+            WebContentUtils._save_websites_data_to_file(data)
+        except FileNotFoundError as e:
+            messagebox.showinfo("Opps!", f"{e}")
+        except ConnectionError as e:
+            messagebox.showinfo("Opps!", f"{e}")
 
     @staticmethod
-    def add_website(filepath: str) -> None:
-        with open(filepath, "a") as file:
-            file.write("\n" + "https://csstats.gg")
+    def add_website(filepath: str, website: str = "https://csstats.gg") -> None:
+        last_index = 0
+        with open(filepath, "r") as file:
+            lines = file.readlines()
+        for index, element in enumerate(lines):
+            last_index = index
+        if last_index > 1:
+            lines.append("\n" + website)
+        elif last_index == 1:
+            lines.append(website)
+        else:
+            lines.append(website + "\n")
+        with open(filepath, "w") as file:
+            file.writelines(lines)
 
     @staticmethod
     def delete_website(filepath: str) -> None:
-        with open(filepath, "a") as file:
-            file.write("\n" + "https://csstats.gg")
+        with open(filepath, "r") as file:
+            lines = file.readlines()[:-1]
+        with open(filepath, "w") as file:
+            last_index = 0
+            for index, element in enumerate(lines):
+                last_index = index
+            i = 0
+            for line in lines:
+                if i != last_index:
+                    file.write(line)
+                    i += 1
+                else:
+                    file.write(line.strip())
 
     @staticmethod
     def get_response_files() -> list:
