@@ -4,6 +4,7 @@ from datetime import date
 import os
 from tkinter import messagebox
 from tkinter import *
+from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 import customtkinter as ctk
 
@@ -95,7 +96,7 @@ class ManagerGUI:
 
     def add_button_action(self, label):
         try:
-            WebContentUtils.add_website(self.filename),
+            WebContentUtils.add_website(self.filename, WebContentUtils.get_website_name()),
             WebContentUtils.configure_path(self.filename, label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
@@ -182,7 +183,12 @@ class WebContentUtils:
             messagebox.showinfo("Opps!", f"{e}")
 
     @staticmethod
-    def add_website(filepath: str, website: str = "https://csstats.gg") -> None:
+    def get_website_name() -> str:
+        website_string = askstring("Website URL", "Enter website URL")
+        return website_string
+
+    @staticmethod
+    def add_website(filepath: str, website: str) -> None:
         last_index = 0
         with open(filepath, "r") as file:
             lines = file.readlines()
