@@ -41,12 +41,12 @@ class ManagerGUI:
         )
         button_right.pack(padx=0, side=RIGHT)
         button_right = ctk.CTkButton(master=self.websites_button_frame, text="delete",
-                                     command=lambda: self.delete_button_action(websites_label))
+                                     command=lambda: self.delete_website_from_file(websites_label))
         button_right.pack(padx=10, side=RIGHT)
         button_middle = ctk.CTkButton(
             master=self.websites_button_frame,
             text="add",
-            command=lambda: self.add_button_action(websites_label),
+            command=lambda: self.add_website_url(websites_label),
         )
         button_middle.pack(padx=0, side=RIGHT)
 
@@ -94,14 +94,14 @@ class ManagerGUI:
 
         self.root.mainloop()
 
-    def add_button_action(self, label):
+    def add_website_url(self, label):
         try:
             WebContentUtils.add_website(self.filename, WebContentUtils.get_website_name()),
             WebContentUtils.configure_path(self.filename, label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
-    def delete_button_action(self, label):
+    def delete_website_from_file(self, label):
         try:
             WebContentUtils.delete_website(self.filename),
             WebContentUtils.configure_path(self.filename, label)
