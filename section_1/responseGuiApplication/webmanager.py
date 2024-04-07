@@ -66,7 +66,7 @@ class ManagerGUI:
         button_left = ctk.CTkButton(
             master=self.response_button_frame,
             text="<-",
-            command=lambda: self.change_response_index("Left", response_label, file_name_label),
+            command=lambda: self.change_response_index(TRUE, response_label, file_name_label),
         )
 
         file_name_label = ctk.CTkLabel(
@@ -78,7 +78,7 @@ class ManagerGUI:
         button_right = ctk.CTkButton(
             master=self.response_button_frame,
             text="->",
-            command=lambda: self.change_response_index("Right", response_label, file_name_label),
+            command=lambda: self.change_response_index(FALSE, response_label, file_name_label),
         )
         button_left.pack(side=LEFT)
         button_right.pack(side=RIGHT)
@@ -112,13 +112,13 @@ class ManagerGUI:
         self.filename = WebContentUtils.return_filename()
         WebContentUtils.configure_path(self.filename, label)
 
-    def change_response_index(self, direction: str, label, second_label):
-        if direction == "Left":
+    def change_response_index(self, left_direction: bool, label, second_label):
+        if left_direction:
             if self.response_index >= 0:
                 self.response_index -= 1
             else:
                 self.response_index = len(WebContentUtils.get_response_files()) - 1
-        elif direction == "Right":
+        else:
             if self.response_index < (len(WebContentUtils.get_response_files()) - 1):
                 self.response_index += 1
             else:
