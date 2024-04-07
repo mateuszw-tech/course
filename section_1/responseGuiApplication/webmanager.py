@@ -40,8 +40,11 @@ class ManagerGUI:
             command=lambda: WebContentUtils.pull_websites_content(self.filename),
         )
         button_right.pack(padx=0, side=RIGHT)
-        button_right = ctk.CTkButton(master=self.websites_button_frame, text="delete",
-                                     command=lambda: self.delete_website_from_file(websites_label))
+        button_right = ctk.CTkButton(
+            master=self.websites_button_frame,
+            text="delete",
+            command=lambda: self.delete_website_from_file(websites_label),
+        )
         button_right.pack(padx=10, side=RIGHT)
         button_middle = ctk.CTkButton(
             master=self.websites_button_frame,
@@ -58,9 +61,7 @@ class ManagerGUI:
         )
         websites_label.pack(expand=True)
 
-        self.response_frame.pack(
-            pady=25, padx=60, fill="both", side=BOTTOM, expand=True
-        )
+        self.response_frame.pack(pady=25, padx=60, fill="both", side=BOTTOM, expand=True)
 
         self.response_button_frame.pack(fill="x", expand=False, side=TOP)
         button_left = ctk.CTkButton(
@@ -94,25 +95,27 @@ class ManagerGUI:
 
         self.root.mainloop()
 
-    def add_website_url(self, label):
+    def add_website_url(self, website_file_label: ctk.CTkLabel) -> None:
         try:
             WebContentUtils.add_website(self.filename, WebContentUtils.get_website_name()),
-            WebContentUtils.configure_path(self.filename, label)
+            WebContentUtils.configure_path(self.filename, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
-    def delete_website_from_file(self, label):
+    def delete_website_from_file(self, website_file_label: ctk.CTkLabel) -> None:
         try:
             WebContentUtils.delete_website(self.filename),
-            WebContentUtils.configure_path(self.filename, label)
+            WebContentUtils.configure_path(self.filename, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
-    def load_filename(self, label):
+    def load_filename(self, website_file_label: ctk.CTkLabel) -> None:
         self.filename = WebContentUtils.return_filename()
-        WebContentUtils.configure_path(self.filename, label)
+        WebContentUtils.configure_path(self.filename, website_file_label)
 
-    def change_response_index(self, left_direction: bool, label, second_label):
+    def change_response_index(
+        self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
+    ) -> None:
         if left_direction:
             if self.response_index >= 0:
                 self.response_index -= 1
@@ -124,15 +127,15 @@ class ManagerGUI:
             else:
                 self.response_index = 0
 
-        label.configure(text=WebContentUtils.load_response(self.response_index))
-        second_label.configure(text=WebContentUtils.load_file_name(self.response_index))
+        content_label.configure(text=WebContentUtils.load_response(self.response_index))
+        file_name_label.configure(text=WebContentUtils.load_file_name(self.response_index))
 
 
 class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-            data: list = None,  # dodać [type]
+        data: list = None,  # dodać [type]
     ) -> None:
         number = 0
         file_path = "archive/archive.txt"
@@ -147,7 +150,7 @@ class WebContentUtils:
             )
 
     @staticmethod
-    def return_website_list_as_string(path) -> str:
+    def return_website_list_as_string(path: str) -> str:
         websites_list = open(path, "r").read().split("\n")
         return "\n".join(websites_list)
 
@@ -228,17 +231,14 @@ class WebContentUtils:
         return files
 
     @staticmethod
-    def load_file_name(index):
+    def load_file_name(index) -> str:
         return f"{WebContentUtils.get_response_files()[index]}"
 
     @staticmethod
-    def load_response(index):
+    def load_response(index) -> str:
         f = open(f"archive/{WebContentUtils.get_response_files()[index]}", "r")
         elements = json.load(f)
-        test = ""
         response = []
         for element in elements:
-            response.append(
-                f"{element['Date']} - {element['Address']} - {element['Content']}"
-            )
+            response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
         return "\n".join(response)
