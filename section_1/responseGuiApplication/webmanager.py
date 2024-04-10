@@ -114,7 +114,7 @@ class ManagerGUI:
         WebContentUtils.configure_path(self.filename, website_file_label)
 
     def change_response_index(
-        self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
+            self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
     ) -> None:
         if left_direction:
             if self.response_index >= 0:
@@ -135,19 +135,33 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-        data: list = None,  # dodać [type]
+            data: list = None,  # dodać [type]
     ) -> None:
         number = 0
-        file_path = "archive/archive.txt"
-        while os.path.exists(file_path):
-            number += 1
-            file_path = f"archive/archive{number}.txt"
-        with open(file_path, "w") as f:
-            json.dump(
-                data,
-                f,
-                indent=1,
-            )
+        file_path = "archive/archive.json"
+        directory = "archive"
+        is_dir_exist = os.path.exists(directory)
+        if is_dir_exist:
+            while os.path.exists(file_path):
+                number += 1
+                file_path = f"archive/archive{number}.json"
+            with open(file_path, "w") as f:
+                json.dump(
+                    data,
+                    f,
+                    indent=1,
+                )
+        else:
+            os.makedirs(directory)
+            while os.path.exists(file_path):
+                number += 1
+                file_path = f"archive/archive{number}.json"
+            with open(file_path, "w") as f:
+                json.dump(
+                    data,
+                    f,
+                    indent=1,
+                )
 
     @staticmethod
     def return_website_list_as_string(path: str) -> str:
@@ -158,7 +172,7 @@ class WebContentUtils:
     def return_filename() -> str:
         filename = askopenfilename(
             initialdir="C:\\Users\\learn_python()\\PycharmProjects\\course\\section_1\\responseGuiApplication",
-            filetypes=(("Text files", "*.txt"), ("all files", "*.*")),
+            filetypes=(("Text files", "*.json"), ("all files", "*.*")),
         )
         return filename
 
@@ -225,20 +239,36 @@ class WebContentUtils:
     @staticmethod
     def get_response_files() -> list:
         files = []
-        for file in os.listdir("archive"):
-            if file.endswith(".txt"):
-                files.append(file)
-        return files
+        directory = "archive"
+        is_dir_exists = os.path.exists(directory)
+        if is_dir_exists:
+            for file in os.listdir("archive"):
+                if file.endswith(".json"):
+                    files.append(file)
+            return files
+        else:
+            os.makedirs(directory)
+            for file in os.listdir("archive"):
+                if file.endswith(".json"):
+                    files.append(file)
+            return files
 
     @staticmethod
     def load_file_name(index) -> str:
-        return f"{WebContentUtils.get_response_files()[index]}"
+        try:
+            return f"{WebContentUtils.get_response_files()[index]}"
+        except IndexError:
+            return "No files"
 
     @staticmethod
-    def load_response(index) -> str:
-        f = open(f"archive/{WebContentUtils.get_response_files()[index]}", "r")
-        elements = json.load(f)
-        response = []
-        for element in elements:
-            response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
-        return "\n".join(response)
+    def load_response(index: int, directory="archive") -> str:
+        try:
+            f = open(f"{directory}/{WebContentUtils.get_response_files()[index]}", "r")
+            elements = json.load(f)
+            response = []
+            for element in elements:
+                response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
+            return "\n".join(response)
+
+        except IndexError:
+            return "No files"
