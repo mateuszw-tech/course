@@ -172,7 +172,7 @@ class WebContentUtils:
     def return_filename() -> str:
         filename = askopenfilename(
             initialdir="C:\\Users\\learn_python()\\PycharmProjects\\course\\section_1\\responseGuiApplication",
-            filetypes=(("Text files", "*.txt"), ("all files", "*.*")),
+            filetypes=(("Text files", "*.json"), ("all files", "*.*")),
         )
         return filename
 
