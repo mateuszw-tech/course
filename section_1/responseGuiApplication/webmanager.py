@@ -23,6 +23,7 @@ class ManagerGUI:
         self.response_button_frame = ctk.CTkFrame(master=self.response_frame)
         self.filename = ""
         self.response_index = 0
+        WebContentUtils.application_settings()
 
     def display_menu(self):
         self.websites_frame.pack(pady=25, padx=60, fill="both", side=TOP, expand=True)
@@ -132,6 +133,18 @@ class ManagerGUI:
 
 
 class WebContentUtils:
+    @staticmethod
+    def application_settings() -> None:
+        settings = [{"archive_dir": "path/to/archive/dir"}]
+        if os.path.exists('settings.json'):
+            pass
+        else:
+            with open("settings.json", "w") as f:
+                json.dump(
+                    settings,
+                    f,
+                    indent=1,
+                )
 
     @staticmethod
     def _save_websites_data_to_file(
