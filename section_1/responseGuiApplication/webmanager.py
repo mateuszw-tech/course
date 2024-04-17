@@ -21,11 +21,12 @@ class ManagerGUI:
         self.websites_button_frame = ctk.CTkFrame(master=self.websites_frame)
         self.response_frame = ctk.CTkFrame(master=self.root)
         self.response_button_frame = ctk.CTkFrame(master=self.response_frame)
-        self.filename = ""
+        self.websites_path = ""
         self.response_index = 0
-        WebContentUtils.application_settings()
 
-    def display_menu(self):
+    def initialize_ui(self):
+
+        WebContentUtils.ensure_settings_saved_to_file()
         self.websites_frame.pack(pady=25, padx=60, fill="both", side=TOP, expand=True)
         self.websites_button_frame.pack(fill="x", expand=False, side=TOP)
 
@@ -38,7 +39,7 @@ class ManagerGUI:
         button_right = ctk.CTkButton(
             master=self.websites_button_frame,
             text="save to file",
-            command=lambda: WebContentUtils.pull_websites_content(self.filename),
+            command=lambda: WebContentUtils.pull_websites_content_to_archive_file(self.websites_path),
         )
         button_right.pack(padx=0, side=RIGHT)
         button_right = ctk.CTkButton(
@@ -73,7 +74,7 @@ class ManagerGUI:
 
         file_name_label = ctk.CTkLabel(
             master=self.response_button_frame,
-            text=WebContentUtils.load_file_name(self.response_index),
+            text=WebContentUtils.load_current_file_name(self.response_index),
             justify="center",
         )
 
@@ -89,7 +90,7 @@ class ManagerGUI:
         response_label = ctk.CTkLabel(
             master=self.response_frame,
             width=300,
-            text=WebContentUtils.load_response(self.response_index),
+            text=WebContentUtils.load_responses_from_archive_files(self.response_index),
             justify="center",
         )
         response_label.pack(expand=True)
@@ -98,21 +99,22 @@ class ManagerGUI:
 
     def add_website_url(self, website_file_label: ctk.CTkLabel) -> None:
         try:
-            WebContentUtils.add_website(self.filename, WebContentUtils.get_website_name()),
-            WebContentUtils.configure_path(self.filename, website_file_label)
+            WebContentUtils.add_website_entry_to_chosen_file(self.websites_path,
+                                                             WebContentUtils.get_website_entry_url()),
+            WebContentUtils.configure_path(self.websites_path, website_file_label)
         except FileNotFoundError as e:
-            messagebox.showinfo("Opps!", f"{e}")
+            messagebox.showinfo("Opps!", f"It looks like file websites is missing \n {e}")
 
     def delete_website_from_file(self, website_file_label: ctk.CTkLabel) -> None:
         try:
-            WebContentUtils.delete_website(self.filename),
-            WebContentUtils.configure_path(self.filename, website_file_label)
+            WebContentUtils.delete_website_entry_from_file(self.websites_path),
+            WebContentUtils.configure_path(self.websites_path, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
     def load_filename(self, website_file_label: ctk.CTkLabel) -> None:
-        self.filename = WebContentUtils.return_filename()
-        WebContentUtils.configure_path(self.filename, website_file_label)
+        self.websites_path = WebContentUtils.return_websites_entries_filename()
+        WebContentUtils.configure_path(self.websites_path, website_file_label)
 
     def change_response_index(
             self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
@@ -121,30 +123,29 @@ class ManagerGUI:
             if self.response_index >= 0:
                 self.response_index -= 1
             else:
-                self.response_index = len(WebContentUtils.get_response_files()) - 1
+                self.response_index = len(WebContentUtils.get_response_files_from_archive_folder()) - 1
         else:
-            if self.response_index < (len(WebContentUtils.get_response_files()) - 1):
+            if self.response_index < (len(WebContentUtils.get_response_files_from_archive_folder()) - 1):
                 self.response_index += 1
             else:
                 self.response_index = 0
 
-        content_label.configure(text=WebContentUtils.load_response(self.response_index))
-        file_name_label.configure(text=WebContentUtils.load_file_name(self.response_index))
+        content_label.configure(text=WebContentUtils.load_responses_from_archive_files(self.response_index))
+        file_name_label.configure(text=WebContentUtils.load_current_file_name(self.response_index))
 
 
 class WebContentUtils:
     @staticmethod
-    def application_settings() -> None:
+    def ensure_settings_saved_to_file() -> None:
         settings = [{"archive_dir": "path/to/archive/dir"}]
         if os.path.exists('settings.json'):
-            pass
-        else:
-            with open("settings.json", "w") as f:
-                json.dump(
-                    settings,
-                    f,
-                    indent=1,
-                )
+            return
+        with open("settings.json", "w") as f:
+            json.dump(
+                settings,
+                f,
+                indent=1,
+            )
 
     @staticmethod
     def _save_websites_data_to_file(
@@ -154,27 +155,17 @@ class WebContentUtils:
         file_path = "archive/archive.json"
         directory = "archive"
         is_dir_exist = os.path.exists(directory)
-        if is_dir_exist:
-            while os.path.exists(file_path):
-                number += 1
-                file_path = f"archive/archive{number}.json"
-            with open(file_path, "w") as f:
-                json.dump(
-                    data,
-                    f,
-                    indent=1,
-                )
-        else:
+        if not is_dir_exist:
             os.makedirs(directory)
-            while os.path.exists(file_path):
-                number += 1
-                file_path = f"archive/archive{number}.json"
-            with open(file_path, "w") as f:
-                json.dump(
-                    data,
-                    f,
-                    indent=1,
-                )
+        while os.path.exists(file_path):
+            number += 1
+            file_path = f"archive/archive{number}.json"
+        with open(file_path, "w") as f:
+            json.dump(
+                data,
+                f,
+                indent=1,
+            )
 
     @staticmethod
     def return_website_list_as_string(path: str) -> str:
@@ -182,7 +173,7 @@ class WebContentUtils:
         return "\n".join(websites_list)
 
     @staticmethod
-    def return_filename() -> str:
+    def return_websites_entries_filename() -> str:
         filename = askopenfilename(
             initialdir="C:\\Users\\learn_python()\\PycharmProjects\\course\\section_1\\responseGuiApplication",
             filetypes=(("Text files", "*.json"), ("all files", "*.*")),
@@ -190,11 +181,11 @@ class WebContentUtils:
         return filename
 
     @staticmethod
-    def configure_path(filename, label) -> None:
+    def configure_path(filename, label) -> None:  # Jak to zmienić?
         label.configure(text=WebContentUtils.return_website_list_as_string(filename))
 
     @staticmethod
-    def pull_websites_content(filename: str) -> None:
+    def pull_websites_content_to_archive_file(filename: str) -> None:
         try:
             data: list = []
             for website in open(filename, "r").read().split("\n"):
@@ -213,17 +204,18 @@ class WebContentUtils:
             messagebox.showinfo("Opps!", f"{e}")
 
     @staticmethod
-    def get_website_name() -> str:
+    def get_website_entry_url() -> str:
         website_string = askstring("Website URL", "Enter website URL")
         return website_string
 
     @staticmethod
-    def add_website(filepath: str, website: str) -> None:
+    def add_website_entry_to_chosen_file(filepath: str, website: str) -> None:
         last_index = 0
         with open(filepath, "r") as file:
             lines = file.readlines()
         for index, element in enumerate(lines):
             last_index = index
+        # Handling difficult line endings
         if last_index > 1:
             lines.append("\n" + website)
         elif last_index == 1:
@@ -234,7 +226,7 @@ class WebContentUtils:
             file.writelines(lines)
 
     @staticmethod
-    def delete_website(filepath: str) -> None:
+    def delete_website_entry_from_file(filepath: str) -> None:
         with open(filepath, "r") as file:
             lines = file.readlines()[:-1]
         with open(filepath, "w") as file:
@@ -250,11 +242,11 @@ class WebContentUtils:
                     file.write(line.strip())
 
     @staticmethod
-    def get_response_files() -> list:
+    def get_response_files_from_archive_folder() -> list:
         files = []
         directory = "archive"
         is_dir_exists = os.path.exists(directory)
-        if is_dir_exists:
+        if is_dir_exists:  # Skrócić if elsa
             for file in os.listdir("archive"):
                 if file.endswith(".json"):
                     files.append(file)
@@ -267,16 +259,16 @@ class WebContentUtils:
             return files
 
     @staticmethod
-    def load_file_name(index) -> str:
+    def load_current_file_name(index) -> str:
         try:
-            return f"{WebContentUtils.get_response_files()[index]}"
+            return f"{WebContentUtils.get_response_files_from_archive_folder()[index]}"
         except IndexError:
             return "No files"
 
     @staticmethod
-    def load_response(index: int, directory="archive") -> str:
+    def load_responses_from_archive_files(index: int, directory="archive") -> str:
         try:
-            f = open(f"{directory}/{WebContentUtils.get_response_files()[index]}", "r")
+            f = open(f"{directory}/{WebContentUtils.get_response_files_from_archive_folder()[index]}", "r")
             elements = json.load(f)
             response = []
             for element in elements:

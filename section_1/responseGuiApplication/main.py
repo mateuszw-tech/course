@@ -1,4 +1,4 @@
 from webmanager import ManagerGUI
 
 manager_app: ManagerGUI = ManagerGUI()
-manager_app.display_menu()
+manager_app.initialize_ui()
