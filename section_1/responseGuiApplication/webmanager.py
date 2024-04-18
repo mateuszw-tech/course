@@ -31,7 +31,7 @@ class ManagerGUI:
         load_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="load",
-            command=lambda: self.load_filename(websites_label),
+            command=lambda: self.load_websites_entries_filename(websites_label),
         )
 
         save_button = ctk.CTkButton(
@@ -117,12 +117,12 @@ class ManagerGUI:
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
-    def load_filename(self, website_file_label: ctk.CTkLabel) -> None:
+    def load_websites_entries_filename(self, website_file_label: ctk.CTkLabel) -> None:
         self.websites_path = WebContentUtils.return_websites_entries_filename()
         WebContentUtils.configure_path(self.websites_path, website_file_label)
 
     def change_response_index(
-        self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
+            self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
     ) -> None:
         if left_direction:
             if self.response_index >= 0:
@@ -142,7 +142,7 @@ class ManagerGUI:
 class WebContentUtils:
     @staticmethod
     def ensure_settings_saved_to_file() -> None:
-        settings = [{"archive_dir": "path/to/archive/dir"}]
+        settings = [{"archive_dir": "archive"}]
         if os.path.exists("settings.json"):
             return
         with open("settings.json", "w") as f:
@@ -154,7 +154,7 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-        data: list = None,  # dodać [type]
+            data: list = None,  # dodać [type]
     ) -> None:
         number = 0
         file_path = "archive/archive.json"
@@ -207,6 +207,8 @@ class WebContentUtils:
             messagebox.showinfo("Opps!", f"{e}")
         except ConnectionError as e:
             messagebox.showinfo("Opps!", f"{e}")
+        except Exception as e:
+            messagebox.showinfo("Opps!", f"{e}")
 
     @staticmethod
     def get_website_entry_url() -> str:
@@ -249,19 +251,16 @@ class WebContentUtils:
     @staticmethod
     def get_response_files_from_archive_folder() -> list:
         files = []
-        directory = "archive"
+        settings = json.load(open("settings.json", "r"))
+        directory = f"{settings[0]['archive_dir']}"
         is_dir_exists = os.path.exists(directory)
-        if is_dir_exists:  # Skrócić if elsa
-            for file in os.listdir("archive"):
-                if file.endswith(".json"):
-                    files.append(file)
-            return files
-        else:
+
+        if not is_dir_exists:
             os.makedirs(directory)
-            for file in os.listdir("archive"):
-                if file.endswith(".json"):
-                    files.append(file)
-            return files
+        for file in os.listdir("archive"):
+            if file.endswith(".json"):
+                files.append(file)
+        return files
 
     @staticmethod
     def load_current_file_name(index) -> str:
@@ -275,6 +274,7 @@ class WebContentUtils:
         try:
             f = open(f"{directory}/{WebContentUtils.get_response_files_from_archive_folder()[index]}", "r")
             elements = json.load(f)
+            f.close()
             response = []
             for element in elements:
                 response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
