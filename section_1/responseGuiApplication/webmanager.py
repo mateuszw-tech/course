@@ -27,33 +27,30 @@ class ManagerGUI:
     def initialize_ui(self):
 
         WebContentUtils.ensure_settings_saved_to_file()
-        self.websites_frame.pack(pady=25, padx=60, fill="both", side=TOP, expand=True)
-        self.websites_button_frame.pack(fill="x", expand=False, side=TOP)
 
-        button_left = ctk.CTkButton(
+        load_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="load",
             command=lambda: self.load_filename(websites_label),
         )
-        button_left.pack(padx=0, side=LEFT)
-        button_right = ctk.CTkButton(
+
+        save_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="save to file",
             command=lambda: WebContentUtils.pull_websites_content_to_archive_file(self.websites_path),
         )
-        button_right.pack(padx=0, side=RIGHT)
-        button_right = ctk.CTkButton(
+
+        delete_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="delete",
             command=lambda: self.delete_website_from_file(websites_label),
         )
-        button_right.pack(padx=10, side=RIGHT)
-        button_middle = ctk.CTkButton(
+
+        add_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="add",
             command=lambda: self.add_website_url(websites_label),
         )
-        button_middle.pack(padx=0, side=RIGHT)
 
         websites_label = ctk.CTkLabel(
             master=self.websites_frame,
@@ -61,11 +58,7 @@ class ManagerGUI:
             text="No websites file",
             justify="center",
         )
-        websites_label.pack(expand=True)
 
-        self.response_frame.pack(pady=25, padx=60, fill="both", side=BOTTOM, expand=True)
-
-        self.response_button_frame.pack(fill="x", expand=False, side=TOP)
         button_left = ctk.CTkButton(
             master=self.response_button_frame,
             text="<-",
@@ -83,9 +76,6 @@ class ManagerGUI:
             text="->",
             command=lambda: self.change_response_index(FALSE, response_label, file_name_label),
         )
-        button_left.pack(side=LEFT)
-        button_right.pack(side=RIGHT)
-        file_name_label.pack()
 
         response_label = ctk.CTkLabel(
             master=self.response_frame,
@@ -93,14 +83,29 @@ class ManagerGUI:
             text=WebContentUtils.load_responses_from_archive_files(self.response_index),
             justify="center",
         )
+
+        self.websites_frame.pack(pady=25, padx=60, fill="both", side=TOP, expand=True)
+        self.websites_button_frame.pack(fill="x", expand=False, side=TOP)
+        load_button.pack(padx=0, side=LEFT)
+        save_button.pack(padx=0, side=RIGHT)
+        delete_button.pack(padx=10, side=RIGHT)
+        add_button.pack(padx=0, side=RIGHT)
+        websites_label.pack(expand=True)
+
+        self.response_frame.pack(pady=25, padx=60, fill="both", side=BOTTOM, expand=True)
+        self.response_button_frame.pack(fill="x", expand=False, side=TOP)
+        button_left.pack(side=LEFT)
+        button_right.pack(side=RIGHT)
+        file_name_label.pack()
         response_label.pack(expand=True)
 
         self.root.mainloop()
 
     def add_website_url(self, website_file_label: ctk.CTkLabel) -> None:
         try:
-            WebContentUtils.add_website_entry_to_chosen_file(self.websites_path,
-                                                             WebContentUtils.get_website_entry_url()),
+            WebContentUtils.add_website_entry_to_chosen_file(
+                self.websites_path, WebContentUtils.get_website_entry_url()
+            ),
             WebContentUtils.configure_path(self.websites_path, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"It looks like file websites is missing \n {e}")
@@ -117,7 +122,7 @@ class ManagerGUI:
         WebContentUtils.configure_path(self.websites_path, website_file_label)
 
     def change_response_index(
-            self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
+        self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
     ) -> None:
         if left_direction:
             if self.response_index >= 0:
@@ -138,7 +143,7 @@ class WebContentUtils:
     @staticmethod
     def ensure_settings_saved_to_file() -> None:
         settings = [{"archive_dir": "path/to/archive/dir"}]
-        if os.path.exists('settings.json'):
+        if os.path.exists("settings.json"):
             return
         with open("settings.json", "w") as f:
             json.dump(
@@ -149,7 +154,7 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-            data: list = None,  # dodać [type]
+        data: list = None,  # dodać [type]
     ) -> None:
         number = 0
         file_path = "archive/archive.json"
