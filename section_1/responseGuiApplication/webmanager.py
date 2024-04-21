@@ -21,7 +21,7 @@ class ManagerGUI:
         self.websites_button_frame = ctk.CTkFrame(master=self.websites_frame)
         self.response_frame = ctk.CTkFrame(master=self.root)
         self.response_button_frame = ctk.CTkFrame(master=self.response_frame)
-        self.websites_path = ""
+        self.websites_path = WebContentUtils.load_websites_file_path_from_settings()
         self.response_index = 0
 
     def initialize_ui(self):
@@ -55,7 +55,7 @@ class ManagerGUI:
         websites_label = ctk.CTkLabel(
             master=self.websites_frame,
             width=300,
-            text="No websites file",
+            text=WebContentUtils.get_websites_entries_from_settings(),
             justify="center",
         )
 
@@ -138,11 +138,31 @@ class ManagerGUI:
         content_label.configure(text=WebContentUtils.load_responses_from_archive_files(self.response_index))
         file_name_label.configure(text=WebContentUtils.load_current_file_name(self.response_index))
 
+    def get_websites_url_path_from_settings(self, website_file_label: ctk.CTkLabel):
+        settings = json.load(open("settings.json", "r"))
+        self.websites_path = f"{settings[0]['websites_file']}"
+        WebContentUtils.configure_path(self.websites_path, website_file_label)
+
 
 class WebContentUtils:
+
+    @staticmethod
+    def load_websites_file_path_from_settings() -> str:
+        settings = json.load(open("settings.json", "r"))
+        return f"{settings[0]['websites_file']}"
+
+    @staticmethod
+    def get_websites_entries_from_settings():
+        try:
+            websites_list = open(WebContentUtils.load_websites_file_path_from_settings(), "r").read().split("\n")
+            return "\n".join(websites_list)
+        except FileNotFoundError:
+            return "Cannot Find websites file. Please check if the websites file exists or its configured properly"
+
+
     @staticmethod
     def ensure_settings_saved_to_file() -> None:
-        settings = [{"archive_dir": "archive"}]
+        settings = [{"archive_dir": "archive", "websites_file": "websites.txt"}]
         if os.path.exists("settings.json"):
             return
         with open("settings.json", "w") as f:
@@ -157,8 +177,9 @@ class WebContentUtils:
             data: list = None,  # dodać [type]
     ) -> None:
         number = 0
-        file_path = "archive/archive.json"
-        directory = "archive"
+        settings = json.load(open("settings.json", "r"))
+        file_path = f"{settings[0]['archive_dir']}/archive.json"
+        directory = f"{settings[0]['archive_dir']}"
         is_dir_exist = os.path.exists(directory)
         if not is_dir_exist:
             os.makedirs(directory)
@@ -181,7 +202,7 @@ class WebContentUtils:
     def return_websites_entries_filename() -> str:
         filename = askopenfilename(
             initialdir="C:\\Users\\learn_python()\\PycharmProjects\\course\\section_1\\responseGuiApplication",
-            filetypes=(("Text files", "*.json"), ("all files", "*.*")),
+            filetypes=(("Text files", "*.txt"), ("all files", "*.*")),
         )
         return filename
 
