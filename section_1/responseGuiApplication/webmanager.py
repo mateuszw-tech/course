@@ -22,12 +22,13 @@ class ManagerGUI:
         self.websites_button_frame = ctk.CTkFrame(master=self.websites_frame)
         self.response_frame = ctk.CTkFrame(master=self.root)
         self.response_button_frame = ctk.CTkFrame(master=self.response_frame)
-        self.websites_path = WebContentUtils.load_websites_file_path_from_settings()
+        self.websites_path = ""
         self.response_index = 0
 
     def initialize_ui(self):
 
         WebContentUtils.ensure_settings_saved_to_file()
+        self.websites_path = WebContentUtils.load_websites_file_path_from_settings()
 
         load_button = ctk.CTkButton(
             master=self.websites_button_frame,
@@ -107,6 +108,10 @@ class ManagerGUI:
         response_label.pack(expand=True)
 
         self.root.mainloop()
+
+    def load_settings_for_initialize_ui(self):
+        WebContentUtils.ensure_settings_saved_to_file()
+        self.websites_path = WebContentUtils.load_websites_file_path_from_settings()
 
     def add_website_url(self, website_file_label: ctk.CTkLabel) -> None:
         try:
