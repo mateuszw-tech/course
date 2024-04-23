@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 import customtkinter as ctk
+from typing import Optional
 
 
 class ManagerGUI:
@@ -37,7 +38,9 @@ class ManagerGUI:
         save_button = ctk.CTkButton(
             master=self.websites_button_frame,
             text="save to file",
-            command=lambda: WebContentUtils.pull_websites_content_to_archive_file(self.websites_path),
+            command=lambda: WebContentUtils.pull_websites_content_to_archive_file(
+                self.websites_path
+            ),
         )
 
         delete_button = ctk.CTkButton(
@@ -62,7 +65,9 @@ class ManagerGUI:
         button_left = ctk.CTkButton(
             master=self.response_button_frame,
             text="<-",
-            command=lambda: self.change_response_index(TRUE, response_label, file_name_label),
+            command=lambda: self.change_response_index(
+                TRUE, response_label, file_name_label
+            ),
         )
 
         file_name_label = ctk.CTkLabel(
@@ -74,7 +79,9 @@ class ManagerGUI:
         button_right = ctk.CTkButton(
             master=self.response_button_frame,
             text="->",
-            command=lambda: self.change_response_index(FALSE, response_label, file_name_label),
+            command=lambda: self.change_response_index(
+                FALSE, response_label, file_name_label
+            ),
         )
 
         response_label = ctk.CTkLabel(
@@ -106,42 +113,53 @@ class ManagerGUI:
             WebContentUtils.add_website_entry_to_chosen_file(
                 self.websites_path, WebContentUtils.get_website_entry_url()
             ),
-            WebContentUtils.configure_path(self.websites_path, website_file_label)
+            WebContentUtils.configure_label(self.websites_path, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"It looks like file websites is missing \n {e}")
 
     def delete_website_from_file(self, website_file_label: ctk.CTkLabel) -> None:
         try:
             WebContentUtils.delete_website_entry_from_file(self.websites_path),
-            WebContentUtils.configure_path(self.websites_path, website_file_label)
+            WebContentUtils.configure_label(self.websites_path, website_file_label)
         except FileNotFoundError as e:
             messagebox.showinfo("Opps!", f"{e}")
 
     def load_websites_entries_filename(self, website_file_label: ctk.CTkLabel) -> None:
         self.websites_path = WebContentUtils.return_websites_entries_filename()
-        WebContentUtils.configure_path(self.websites_path, website_file_label)
+        WebContentUtils.configure_label(self.websites_path, website_file_label)
 
     def change_response_index(
-            self, left_direction: bool, content_label: ctk.CTkLabel, file_name_label: ctk.CTkLabel
+            self,
+            left_direction: bool,
+            content_label: ctk.CTkLabel,
+            file_name_label: ctk.CTkLabel,
     ) -> None:
         if left_direction:
             if self.response_index >= 0:
                 self.response_index -= 1
             else:
-                self.response_index = len(WebContentUtils.get_response_files_from_archive_folder()) - 1
+                self.response_index = (
+                        len(WebContentUtils.get_response_files_from_archive_folder()) - 1
+                )
         else:
-            if self.response_index < (len(WebContentUtils.get_response_files_from_archive_folder()) - 1):
+            if self.response_index < (
+                    len(WebContentUtils.get_response_files_from_archive_folder()) - 1
+            ):
                 self.response_index += 1
             else:
                 self.response_index = 0
 
-        content_label.configure(text=WebContentUtils.load_responses_from_archive_files(self.response_index))
-        file_name_label.configure(text=WebContentUtils.load_current_file_name(self.response_index))
+        content_label.configure(
+            text=WebContentUtils.load_responses_from_archive_files(self.response_index)
+        )
+        file_name_label.configure(
+            text=WebContentUtils.load_current_file_name(self.response_index)
+        )
 
     def get_websites_url_path_from_settings(self, website_file_label: ctk.CTkLabel):
         settings = json.load(open("settings.json", "r"))
         self.websites_path = f"{settings[0]['websites_file']}"
-        WebContentUtils.configure_path(self.websites_path, website_file_label)
+        WebContentUtils.configure_label(self.websites_path, website_file_label)
 
 
 class WebContentUtils:
@@ -154,11 +172,14 @@ class WebContentUtils:
     @staticmethod
     def get_websites_entries_from_settings():
         try:
-            websites_list = open(WebContentUtils.load_websites_file_path_from_settings(), "r").read().split("\n")
+            websites_list = (
+                open(WebContentUtils.load_websites_file_path_from_settings(), "r")
+                .read()
+                .split("\n")
+            )
             return "\n".join(websites_list)
         except FileNotFoundError:
             return "Cannot Find websites file. Please check if the websites file exists or its configured properly"
-
 
     @staticmethod
     def ensure_settings_saved_to_file() -> None:
@@ -174,7 +195,7 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-            data: list = None,  # dodać [type]
+            data: list[str] = None,
     ) -> None:
         number = 0
         settings = json.load(open("settings.json", "r"))
@@ -207,7 +228,7 @@ class WebContentUtils:
         return filename
 
     @staticmethod
-    def configure_path(filename, label) -> None:  # Jak to zmienić?
+    def configure_label(filename, label) -> None:
         label.configure(text=WebContentUtils.return_website_list_as_string(filename))
 
     @staticmethod
@@ -232,13 +253,15 @@ class WebContentUtils:
             messagebox.showinfo("Opps!", f"{e}")
 
     @staticmethod
-    def get_website_entry_url() -> str:
+    def get_website_entry_url() -> Optional[str]:
         website_string = askstring("Website URL", "Enter website URL")
         return website_string
 
     @staticmethod
     def add_website_entry_to_chosen_file(filepath: str, website: str) -> None:
         last_index = 0
+        if website is None:
+            return
         with open(filepath, "r") as file:
             lines = file.readlines()
         for index, element in enumerate(lines):
@@ -293,12 +316,17 @@ class WebContentUtils:
     @staticmethod
     def load_responses_from_archive_files(index: int, directory="archive") -> str:
         try:
-            f = open(f"{directory}/{WebContentUtils.get_response_files_from_archive_folder()[index]}", "r")
+            f = open(
+                f"{directory}/{WebContentUtils.get_response_files_from_archive_folder()[index]}",
+                "r",
+            )
             elements = json.load(f)
             f.close()
             response = []
             for element in elements:
-                response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
+                response.append(
+                    f"{element['Date']} - {element['Address']} - {element['Content']}"
+                )
             return "\n".join(response)
 
         except IndexError:
