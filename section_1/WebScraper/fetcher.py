@@ -12,13 +12,13 @@ class AdvertisementInfo:
         self.price = price
 
 
-class Adapter(ABC):
+class Fetcher(ABC):
     @abstractmethod
     def load_osint_data(self) -> List[AdvertisementInfo]:
         raise NotImplementedError()
 
 
-class SprzedajemyAdapter(Adapter):
+class SprzedajemyFetcher(Fetcher):
     def load_osint_data(self) -> List[AdvertisementInfo]:
 
         pass

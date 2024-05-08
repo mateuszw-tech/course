@@ -3,8 +3,6 @@ import concurrent.futures
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-import asyncio
-import aiohttp
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -25,6 +23,14 @@ class ScraperUtils:
         translator = str.maketrans(strange, ascii_replacements)
 
         return input_text.translate(translator)
+
+    @staticmethod
+    def get_all_pages_urls_from_different_cities(pages_scraping_method, *args):
+        result_list = []
+        for arg in args:
+            result = pages_scraping_method(arg)
+            result_list.append(result)
+        return result_list
 
 
 class SprzedajemyUtils:
@@ -63,39 +69,6 @@ class SprzedajemyUtils:
 
     @staticmethod
     def get_all_offers_urls(pages: list[str]):
-        urls = []
-        for page in tqdm(pages):
-            offers = SprzedajemyUtils.find_all_offers_in_selected_page(page)
-            for offer in offers:
-                urls.append(f'https://sprzedajemy.pl{offer}')
-        return urls
-
-    # ================== Test z async ================== #
-
-    @staticmethod
-    def return_offer(url):
-        return f'https://sprzedajemy.pl{url}'
-
-    @staticmethod
-    async def fetch_all(pages):
-        urls = []
-        for page in tqdm(pages):
-            offers = SprzedajemyUtils.find_all_offers_in_selected_page(page)
-            for offer in offers:
-                urls.append(f'https://sprzedajemy.pl{offer}')
-        res = await asyncio.gather(*urls)
-        return res
-
-    @staticmethod
-    async def test():
-        urls = SprzedajemyUtils.get_all_pages_urls("Głogów")
-        async with aiohttp.ClientSession():
-            return await SprzedajemyUtils.fetch_all(urls)
-
-    # ================== Test z thread ================== #
-
-    @staticmethod
-    def t_test(pages: list[str]):
         urls = []
         for page in tqdm(pages):
             offers = SprzedajemyUtils.find_all_offers_in_selected_page(page)
