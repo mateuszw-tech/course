@@ -73,3 +73,34 @@ class SprzedajemyUtils:
             for offer in offers:
                 urls.append(offer)
         return urls
+
+    @staticmethod
+    def get_offer_title(soup: BeautifulSoup) -> str:
+        return soup.find("span", class_="isUrgentTitle").get_text()
+
+    @staticmethod
+    def get_offer_username(soup: BeautifulSoup) -> str:
+        return soup.find("strong", class_="name").get_text()
+
+    @staticmethod
+    def get_offer_location(soup: BeautifulSoup) -> str:
+        return soup.find("span", class_="locationName").find("strong").get_text()
+
+    @staticmethod
+    def get_offer_phone_number(soup: BeautifulSoup) -> str:
+        try:
+            phone_number = (
+                    soup.find("span", class_="phone-number-truncated").find("span").get_text()
+                    + " "
+                    + soup.find("span", class_="phone-number-truncated").get("data-phone-end")
+            )
+        except AttributeError:
+            phone_number = "Unknown"
+        return phone_number
+
+    @staticmethod
+    def get_offer_price(soup: BeautifulSoup) -> str:
+        try:
+            return soup.find("strong", class_="price").find("span").get_text()
+        except AttributeError:
+            return "Unknown"

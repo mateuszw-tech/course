@@ -2,22 +2,60 @@ import concurrent
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
+
+from tqdm import tqdm
+
 from utils import SprzedajemyUtils, ScraperUtils
 
 
 class AdvertisementInfo:
 
-    def __init__(self, name: str, location: str, phone_number: str, title: str, price: str):
+    def __init__(
+            self,
+            title: str,
+            username: str,
+            location: str,
+            phone_number: str,
+            price: str,
+            url: str,
+    ):
         self.title = title
-        self.name = name
+        self.username = username
         self.location = location
         self.phone_number = phone_number
         self.price = price
+        self.url = url
+
+    def get_title(self):
+        return self.title
+
+    def get_username(self):
+        return self.username
+
+    def get_location(self):
+        return self.location
+
+    def get_phone_number(self):
+        return self.phone_number
+
+    def get_price(self):
+        return self.price
+
+    def get_url(self):
+        return self.url
+
+    def display_information(self):
+        print("Title: " + self.title
+              + "\nUsername: " + self.username
+              + "\nLocation: " + self.location
+              + "\nPhone Number: " + self.phone_number
+              + "\nPrice: " + self.price
+              + "\nURL: " + self.url)
 
 
 class Fetcher(ABC):
     @abstractmethod
-    def load_osint_data(self) -> List[AdvertisementInfo]:
+    def load_osint_data(self, offer_list) -> List[AdvertisementInfo]:
         raise NotImplementedError()
 
 
@@ -26,8 +64,18 @@ class SprzedajemyFetcher(Fetcher):
     def __init__(self, *cities):
         self.cities = cities
 
-    def load_osint_data(self) -> List[AdvertisementInfo]:
-        pass
+    def load_osint_data(self, offer_list: list[str]) -> List[AdvertisementInfo]:
+        osint_data_futures = []
+        results_list = []
+        with ThreadPoolExecutor(max_workers=18) as executor:
+            for offer in offer_list:
+                osint_data_futures.append(executor.submit(SprzedajemyFetcher.load_data, offer))
+            completed_futures, _ = concurrent.futures.wait(osint_data_futures)
+            for future in completed_futures:
+                results_list.append(future.result())
+            osint_data = [results for results in results_list]
+
+        return osint_data
 
     def get_all_offers_urls(self, threads: int) -> List[str]:
         pages = ScraperUtils.get_all_pages_urls_from_different_cities(SprzedajemyUtils.get_all_pages_urls, *self.cities)
@@ -47,3 +95,13 @@ class SprzedajemyFetcher(Fetcher):
     def change_cities(self, *cities) -> None:
         self.cities = cities
 
+    @staticmethod
+    def load_data(offer_url):
+        soup = ScraperUtils.return_website_string_as_bs4_content(offer_url)
+        title = SprzedajemyUtils.get_offer_title(soup)
+        username = SprzedajemyUtils.get_offer_username(soup)
+        location = SprzedajemyUtils.get_offer_location(soup)
+        phone_number = SprzedajemyUtils.get_offer_phone_number(soup)
+        price = SprzedajemyUtils.get_offer_price(soup)
+        url = offer_url
+        return AdvertisementInfo(title, username, location, phone_number, price, url)
