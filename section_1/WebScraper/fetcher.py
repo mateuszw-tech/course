@@ -23,14 +23,14 @@ class Fetcher(ABC):
 
 class SprzedajemyFetcher(Fetcher):
 
+    def __init__(self, *cities):
+        self.cities = cities
+
     def load_osint_data(self) -> List[AdvertisementInfo]:
         pass
 
-    # todo: add multiple cities argument
-    @staticmethod
-    def get_all_offers_urls(city: str, threads: int) -> List[str]:
-        # pages = ScraperUtils.get_all_pages_urls_from_different_cities(SprzedajemyUtils.get_all_pages_urls, cities)
-        pages = SprzedajemyUtils.get_all_pages_urls(city)
+    def get_all_offers_urls(self, threads: int) -> List[str]:
+        pages = ScraperUtils.get_all_pages_urls_from_different_cities(SprzedajemyUtils.get_all_pages_urls, *self.cities)
         offer_urls_futures = []
         results_list = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
@@ -40,4 +40,10 @@ class SprzedajemyFetcher(Fetcher):
             completed_futures, _ = concurrent.futures.wait(offer_urls_futures)
             for future in completed_futures:
                 results_list.append(future.result())
-        return results_list
+
+            offers = [result for results in results_list for result in results]
+        return offers
+
+    def change_cities(self, *cities) -> None:
+        self.cities = cities
+

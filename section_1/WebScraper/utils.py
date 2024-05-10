@@ -15,7 +15,7 @@ class ScraperUtils:
         return BeautifulSoup(content.content, "html.parser")
 
     @staticmethod
-    def replace_polish_characters(input_text):
+    def replace_polish_characters(input_text: str) -> str:
         strange = "ą, ć, ę, ł, ń, ó, ś, ź, ż"
 
         ascii_replacements = "a, c, e, l, n, o, s, z, z"
@@ -24,13 +24,11 @@ class ScraperUtils:
 
         return input_text.translate(translator)
 
+    # todo: Add Threading
     @staticmethod
     def get_all_pages_urls_from_different_cities(pages_scraping_method, *args):
-        result_list = []
-        for arg in args:
-            result = pages_scraping_method(arg)
-            result_list.append(result)
-        return result_list
+        pages = [result for arg in args for result in pages_scraping_method(arg)]
+        return pages
 
 
 class SprzedajemyUtils:
@@ -63,7 +61,7 @@ class SprzedajemyUtils:
         soup = ScraperUtils.return_website_string_as_bs4_content(page)
         offer_titles = soup.find_all("h2", class_="title")
         for offer_title in offer_titles:
-            offers.append(offer_title.find("a").get('href'))
+            offers.append(f'https://sprzedajemy.pl{offer_title.find("a").get('href')}')
 
         return offers
 
@@ -73,5 +71,5 @@ class SprzedajemyUtils:
         for page in tqdm(pages):
             offers = SprzedajemyUtils.find_all_offers_in_selected_page(page)
             for offer in offers:
-                urls.append(f'https://sprzedajemy.pl{offer}')
+                urls.append(offer)
         return urls
