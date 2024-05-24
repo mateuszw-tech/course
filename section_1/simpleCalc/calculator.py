@@ -31,37 +31,87 @@ class CalculatorApp:
             )
 
         name_label = tkinter.Label(
-            self.frame, text="Simple Calculator by Matthew", bg="#0D1B2A", fg="#415A77", font=("Arial", 20)
+            self.frame,
+            text="Simple Calculator by Matthew",
+            bg="#0D1B2A",
+            fg="#415A77",
+            font=("Arial", 20),
         )
         first_number = tkinter.Entry(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=20, justify="center", font=("Arial", 20)
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=20,
+            justify="center",
+            font=("Arial", 20),
         )
         second_number = tkinter.Entry(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=20, justify="center", font=("Arial", 20)
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=20,
+            justify="center",
+            font=("Arial", 20),
         )
         result_label = tkinter.Label(self.frame, text="2", bg="#0D1B2A", fg="#415A77", font=("Arial", 20))
 
         add_button = tkinter.Button(
-            self.frame, text="+", bg="#0D1B2A", fg="#415A77", width=10, font=("Arial", 15), command=lambda: result("+")
+            self.frame,
+            text="+",
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=10,
+            font=("Arial", 15),
+            command=lambda: result("+"),
         )
         subtract_button = tkinter.Button(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=10, font=("Arial", 15), text="-", command=lambda: result("-")
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=10,
+            font=("Arial", 15),
+            text="-",
+            command=lambda: result("-"),
         )
         multiply_button = tkinter.Button(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=10, font=("Arial", 15), text="*", command=lambda: result("*")
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=10,
+            font=("Arial", 15),
+            text="*",
+            command=lambda: result("*"),
         )
         divide_button = tkinter.Button(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=10, font=("Arial", 15), text="/", command=lambda: result("/")
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=10,
+            font=("Arial", 15),
+            text="/",
+            command=lambda: result("/"),
         )
         power_button = tkinter.Button(
-            self.frame, bg="#0D1B2A", fg="#415A77", width=10, font=("Arial", 15), text="^", command=lambda: result("^")
+            self.frame,
+            bg="#0D1B2A",
+            fg="#415A77",
+            width=10,
+            font=("Arial", 15),
+            text="^",
+            command=lambda: result("^"),
         )
 
         name_label.pack(pady=10)
         result_label.pack(pady=10)
         first_number.pack(ipady=3, pady=10)
         second_number.pack(ipady=3, pady=10)
-        for button in (add_button, subtract_button, multiply_button, divide_button, power_button):
+        for button in (
+            add_button,
+            subtract_button,
+            multiply_button,
+            divide_button,
+            power_button,
+        ):
             button.pack(pady=10)
 
         self.frame.pack()

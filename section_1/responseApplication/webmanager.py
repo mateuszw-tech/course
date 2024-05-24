@@ -8,9 +8,9 @@ import customtkinter as ctk
 
 class WebContentManager:
     def __init__(
-            self,
-            path_to_archive_directory: str = None,
-            websites_list_file_path: str = None,
+        self,
+        path_to_archive_directory: str = None,
+        websites_list_file_path: str = None,
     ):
         self.path_to_archive_directory: str = path_to_archive_directory
         self.websites_list_file_path: str = websites_list_file_path
@@ -22,8 +22,8 @@ class WebContentManager:
     # return []
 
     def _save_websites_data_to_file(
-            self,
-            data: list = None,
+        self,
+        data: list = None,
     ) -> None:
         number: int = 0
         file_path = f"{self.path_to_archive_directory}/archive.txt"
@@ -38,17 +38,15 @@ class WebContentManager:
             )
 
     def print_websites_data(
-            self,
+        self,
     ) -> None:
         for file in os.listdir(self.path_to_archive_directory):
             if file.endswith(".txt"):
                 for element in self._load_websites_data_from_file(file):
-                    print(
-                        f"| {file} - {element['Date']} - {element['Address']} - {element['Content']}"
-                    )
+                    print(f"| {file} - {element['Date']} - {element['Address']} - {element['Content']}")
 
     def pull_websites_content(
-            self,
+        self,
     ) -> None:
         data: list = []
         websites_list = open(self.websites_list_file_path, "r").read().split("\n")

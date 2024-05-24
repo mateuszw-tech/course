@@ -40,8 +40,11 @@ class ManagerGUI:
             command=lambda: WebContentUtils.pull_websites_content(self.filename),
         )
         button_right.pack(padx=0, side=RIGHT)
-        button_right = ctk.CTkButton(master=self.websites_button_frame, text="delete",
-                                     command=lambda: self.delete_button_action(websites_label))
+        button_right = ctk.CTkButton(
+            master=self.websites_button_frame,
+            text="delete",
+            command=lambda: self.delete_button_action(websites_label),
+        )
         button_right.pack(padx=10, side=RIGHT)
         button_middle = ctk.CTkButton(
             master=self.websites_button_frame,
@@ -58,9 +61,7 @@ class ManagerGUI:
         )
         websites_label.pack(expand=True)
 
-        self.response_frame.pack(
-            pady=25, padx=60, fill="both", side=BOTTOM, expand=True
-        )
+        self.response_frame.pack(pady=25, padx=60, fill="both", side=BOTTOM, expand=True)
 
         self.response_button_frame.pack(fill="x", expand=False, side=TOP)
         button_left = ctk.CTkButton(
@@ -132,7 +133,7 @@ class WebContentUtils:
 
     @staticmethod
     def _save_websites_data_to_file(
-            data: list = None,  # dodać [type]
+        data: list = None,  # dodać [type]
     ) -> None:
         number = 0
         file_path = "archive/archive.txt"
@@ -238,7 +239,5 @@ class WebContentUtils:
         test = ""
         response = []
         for element in elements:
-            response.append(
-                f"{element['Date']} - {element['Address']} - {element['Content']}"
-            )
+            response.append(f"{element['Date']} - {element['Address']} - {element['Content']}")
         return "\n".join(response)

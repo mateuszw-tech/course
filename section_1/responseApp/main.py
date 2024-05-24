@@ -2,9 +2,9 @@ import readFile
 import writeFile
 
 websites = (
-    'https://wp.pl',
-    'https://nike.com',
-    'https://wonderfulbrightsplendidmorning.neverssl.com/online/'
+    "https://wp.pl",
+    "https://nike.com",
+    "https://wonderfulbrightsplendidmorning.neverssl.com/online/",
 )
 
 write_json = writeFile.WriteFile(websites)

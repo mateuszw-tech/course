@@ -76,31 +76,44 @@ class SprzedajemyUtils:
 
     @staticmethod
     def get_offer_title(soup: BeautifulSoup) -> str:
-        return soup.find("span", class_="isUrgentTitle").get_text()
+        try:
+            return soup.find("span", class_="isUrgentTitle").get_text()
+        except ConnectionError:
+            return "Unknown"
 
     @staticmethod
     def get_offer_username(soup: BeautifulSoup) -> str:
-        return soup.find("strong", class_="name").get_text()
+        try:
+            return soup.find("strong", class_="name").get_text()
+        except ConnectionError:
+            return "Username not found"
 
     @staticmethod
     def get_offer_location(soup: BeautifulSoup) -> str:
-        return soup.find("span", class_="locationName").find("strong").get_text()
+        try:
+            return soup.find("span", class_="locationName").find("strong").get_text()
+        except ConnectionError:
+            return "Location not found"
 
     @staticmethod
     def get_offer_phone_number(soup: BeautifulSoup) -> str:
         try:
             phone_number = (
-                    soup.find("span", class_="phone-number-truncated").find("span").get_text()
-                    + " "
-                    + soup.find("span", class_="phone-number-truncated").get("data-phone-end")
+                soup.find("span", class_="phone-number-truncated").find("span").get_text()
+                + " "
+                + soup.find("span", class_="phone-number-truncated").get("data-phone-end")
             )
         except AttributeError:
+            phone_number = "Unknown"
+        except ConnectionError:
             phone_number = "Unknown"
         return phone_number
 
     @staticmethod
     def get_offer_price(soup: BeautifulSoup) -> str:
         try:
-            return soup.find("strong", class_="price").find("span").get_text()
+            return soup.find("strong", class_="price").find("span").get_text().strip()
         except AttributeError:
+            return "Unknown"
+        except ConnectionError:
             return "Unknown"
