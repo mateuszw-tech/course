@@ -1,4 +1,5 @@
 import concurrent.futures
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -117,3 +118,7 @@ class SprzedajemyUtils:
             return "Unknown"
         except ConnectionError:
             return "Unknown"
+
+    @staticmethod
+    def failover():
+        time.sleep(8)
