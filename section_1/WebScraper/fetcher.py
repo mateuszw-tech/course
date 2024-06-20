@@ -97,20 +97,16 @@ class SprzedajemyFetcher(Fetcher):
                     print("test " + offer_url)
             await self.append_data(AdvertisementInfo(title, username, location, phone_number, price, url))
         except Exception as e:
-            # ScraperUtils.fail_repeat_execution(self.load_data_async, offer_url)
             print({e})
             raise Exception
 
     async def load_osint_data_async(self, offer_list: list[str]) -> None:
         tasks = []
-        # ScraperUtils.fail_repeat_execution(self.load_data_async, offer)
         for offer in offer_list:
             task = asyncio.create_task(ScraperUtils.fail_repeat_execution(self.load_data_async, offer))
-            # task = asyncio.create_task(ScraperUtils.fail_repeat_execution(self.load_data_async, offer))
             tasks.append(task)
 
         await asyncio.gather(*tasks)
-        # return tasks
 
     def get_osint_data(self):
         return self.current_data
