@@ -1,5 +1,6 @@
 import concurrent.futures
 import time
+import asyncio
 
 import requests
 from bs4 import BeautifulSoup
@@ -30,6 +31,21 @@ class ScraperUtils:
     def get_all_pages_urls_from_different_cities(pages_scraping_method, *args):
         pages = [result for arg in args for result in pages_scraping_method(arg)]
         return pages
+
+    @staticmethod
+    async def fail_repeat_execution(function: callable, *args, max_retries: int = 10, sleep_time: float = 1):
+        retry_count = 0
+        while retry_count < max_retries:
+            try:
+                await function(*args)
+                return
+            except Exception as e:
+                retry_count += 1
+                print("test")
+                if retry_count > max_retries:
+                    print(f"failed, Exception: {e}")
+                    break
+                await asyncio.sleep(sleep_time * retry_count)
 
 
 class SprzedajemyUtils:
@@ -100,9 +116,9 @@ class SprzedajemyUtils:
     def get_offer_phone_number(soup: BeautifulSoup) -> str:
         try:
             phone_number = (
-                soup.find("span", class_="phone-number-truncated").find("span").get_text()
-                + " "
-                + soup.find("span", class_="phone-number-truncated").get("data-phone-end")
+                    soup.find("span", class_="phone-number-truncated").find("span").get_text()
+                    + " "
+                    + soup.find("span", class_="phone-number-truncated").get("data-phone-end")
             )
         except AttributeError:
             phone_number = "Unknown"
@@ -118,7 +134,3 @@ class SprzedajemyUtils:
             return "Unknown"
         except ConnectionError:
             return "Unknown"
-
-    @staticmethod
-    def failover():
-        time.sleep(8)
